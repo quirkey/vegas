@@ -1,0 +1,4 @@
+namespace :vegas do
+  
+  
+end
