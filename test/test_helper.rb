@@ -5,15 +5,13 @@ require 'rack/test'
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'vegas.rb')
 
-Bacon::Context.send(:include, Rack::Test::Methods)
-
 require 'nokogiri'
 
 module TestHelper
-  def app
-    Vegas::App.new
+  def rackup(app)
+    Rack::Test::Session.new(app)
   end
-
+  
   def body
     last_response.body.to_s
   end

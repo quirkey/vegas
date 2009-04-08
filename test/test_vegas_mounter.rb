@@ -51,30 +51,43 @@ describe 'Vegas::Mounter' do
   describe 'invoked with rack' do
     
     describe 'with no mounts' do
+      before do
+        @app = rackup(Vegas::Mounter.new)
+      end
       
       describe 'get /' do
+        before do
+          @app.get '/'
+        end
         
         it 'redirects to /vegas' do
-          
+          @app.last_response.should.be.redirect
+          @app.last_response.location.should.equal '/vegas'
         end
         
       end
       
       describe 'get /somethingelse' do
+        before do
+          @app.get '/'
+        end
         
         it 'should 404' do
-          
+          @app.last_response.should.be.not_found
         end
         
         it 'should display vegas 404' do
-          
+          @app.last_response.body.should.have_element('.vegas')
         end
       end
       
       describe 'get /vegas' do
+        before do
+          @app.get '/vegas'
+        end
         
         it 'should display the vegas index' do
-          
+          @app.last_response.body.should.have_element('.vegas')
         end
         
       end
