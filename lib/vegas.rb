@@ -1,4 +1,6 @@
+require 'rubygems'
 require 'sinatra'
+require 'launchy'
 
 module Vegas
   VERSION = "0.0.1"
