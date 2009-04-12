@@ -6,6 +6,4 @@ end
 
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
-require 'vegas/admin'
-require 'vegas/mounter'
 require 'vegas/runner'
