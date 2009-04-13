@@ -1,15 +1,19 @@
+require 'open-uri'
+require 'logger'
+
 module Vegas
   class Runner
     attr_reader :app, :app_name, :rack_handler, :port, :host, :options
     
     ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
-    START_PORT = 5678
+    PORT       = 5678
     HOST       = '0.0.0.0'
     
     def initialize(app, app_name, set_options = {}, &block)
       @app = app
       @app_name  = app_name
       @options = set_options || {}
+      @rack_handler = @app.send :detect_rack_handler
       define_options do |opts|
         if block_given?
           opts.separator ''
@@ -17,20 +21,19 @@ module Vegas
           yield(opts, app)
         end
       end 
-      @port = options[:port] || START_PORT
       @host = options[:host] || HOST
       @app.set options
-      @rack_handler ||= @app.send :detect_rack_handler
       FileUtils.mkdir_p(app_dir)
-      daemonize! unless options[:foreground]
+      logger.info "== Starting #{app_name}"
+      find_port
+      launch!
       begin
+        daemonize! unless options[:foreground]      
         run!
       rescue RuntimeError => e
-        puts "== Someone is already performing on port #{port}!"
-        @port += 1
-        retry
+        logger.warn "== There was an error starting #{app_name}: #{e}"
+        exit
       end
-      launch!
     end
     
     def app_dir
@@ -38,22 +41,51 @@ module Vegas
     end
     
     def pid_file
-      File.join(app_dir, "#{rack_handler}.pid")
+      File.join(app_dir, "#{app_name}.pid")
+    end
+    
+    def url_file
+      File.join(app_dir, "#{app_name}.url")
     end
     
     def log_file
       File.join(app_dir, "#{app_name}.log")
     end
     
+    def handler_name
+      rack_handler.name.gsub(/.*::/, '')
+    end
+        
+    def find_port
+      if @port = options[:port]
+        if !port_open?
+          logger.warn "== Port #{port} is already in use. Please try another or don't use -P, for auto-port"
+        end
+      else
+        @port = PORT
+        logger.info "== Trying to start #{app_name} on Port #{port}"
+        while !port_open?
+          @port += 1
+          logger.info "== Trying to start #{app_name} on Port #{port}"
+        end
+      end
+    end
+    
+    def port_open?
+      begin
+        open("http://#{host}:#{port}")
+        false
+      rescue Errno::ECONNREFUSED => e
+        true
+      end
+    end
+    
     def run!
-      handler_name = rack_handler.name.gsub(/.*::/, '')
-      puts "== Vegas is running / Sinatra #{Sinatra::VERSION} has taken the stage " +
-            "on #{port} for #{app.environment} with backup from #{handler_name}" unless handler_name =~/cgi/i
       rack_handler.run app, :Host => host, :Port => port do |server|
         trap(:INT) do
           ## Use thins' hard #stop! if available, otherwise just #stop
           server.respond_to?(:stop!) ? server.stop! : server.stop
-          puts "\n== Sinatra has ended his set (crowd applauds)" unless handler_name =~/cgi/i
+          logger.info "== #{app_name} received INT ... stopping : #{Time.now}"
         end
       end
     end
@@ -78,7 +110,25 @@ module Vegas
     end
     
     def launch!
-      
+      Launchy.open("http://#{host}:#{port}")
+    end
+    
+    def kill!
+      pid = File.read(pid_file)
+      if pid
+        logger.warn "== Sending INT to #{pid}"
+        Process.kill('INT', pid.to_i)
+      else
+        logger.warn "== pid not found at #{pid_file}"
+      end
+    end
+
+    def self.logger
+      @logger ||= Logger.new(STDOUT)
+    end
+    
+    def logger
+      self.class.logger
     end
     
     private
@@ -107,6 +157,11 @@ module Vegas
         opts.on("-F", "--foreground", "don't daemonize, run in the foreground") { |f|
           @options[:foreground] = true
         }
+        
+        opts.on('-K', "--kill", "kill the running process and exit") {|k| 
+          kill!
+          exit
+        }
                 
         yield opts if block_given?
         
@@ -129,6 +184,8 @@ module Vegas
         opts.parse! ARGV
       }
     end
+    
+    
     
   end
 end
