@@ -26,13 +26,12 @@ I have a vision of a future where all us developers release gems with simple loc
 
 h3(#usage). Usage
 
-Currently, vegas contains a single class Vegas::Runner that provides a wrapper for a Sinatra app to easily make it into an executable bin. 
+Currently, vegas contains a single class @Vegas::Runner@ that provides a wrapper for a Sinatra app to easily make it into an executable bin. 
 
 Lets say you have a Sinatra app that looks like:
 
 {% highlight ruby %}
 # /my_app.rb
-
 require 'sinatra'
 
 class MyApp < Sinatra::Default
