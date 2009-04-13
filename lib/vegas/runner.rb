@@ -150,6 +150,16 @@ module Vegas
         logger.warn "== pid not found at #{pid_file}"
       end
     end
+    
+    def status
+      if File.exists?(pid_file)
+        logger.info "== #{app_name} running"
+        logger.info "== PID #{File.read(pid_file)}"
+        logger.info "== URL #{File.read(url_file)}" if File.exists?(url_file)
+      else
+        logger.info "== #{app_name} not running!"
+      end
+    end
 
     def self.logger
       @logger ||= Logger.new(STDOUT)
@@ -170,6 +180,7 @@ module Vegas
         opts.on("-s", "--server SERVER", "serve using SERVER (webrick/mongrel)") { |s|
           @rack_handler = Rack::Handler.get(s)
         }
+        
         opts.on("-o", "--host HOST", "listen on HOST (default: #{HOST})") { |host|
           @options[:host] = host
         }
@@ -189,6 +200,11 @@ module Vegas
         opts.on('-K', "--kill", "kill the running process and exit") {|k| 
           kill!
           exit
+        }
+        
+        opts.on('-S', "--status", "display the current running PID and URL then quit") {|s| 
+          status
+          exit!
         }
                 
         yield opts if block_given?
