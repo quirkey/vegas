@@ -10,23 +10,32 @@ module Vegas
     HOST       = '0.0.0.0'
     
     def initialize(app, app_name, set_options = {}, &block)
-      @app = app
-      @app_name  = app_name
-      @options = set_options || {}
+      # initialize
+      @app          = app
+      @app_name     = app_name
+      @options      = set_options || {}
       @rack_handler = @app.send :detect_rack_handler
+      # load options from opt parser
       define_options do |opts|
         if block_given?
           opts.separator ''
           opts.separator "#{app_name} options:"
           yield(opts, app)
         end
-      end 
+      end
+      # set app options
       @host = options[:host] || HOST
       @app.set options
+      # initialize app dir
       FileUtils.mkdir_p(app_dir)
+      
       logger.info "== Starting #{app_name}"
+      
+      check_for_running
       find_port
+      write_url
       launch!
+      
       begin
         daemonize! unless options[:foreground]      
         run!
@@ -46,6 +55,10 @@ module Vegas
     
     def url_file
       File.join(app_dir, "#{app_name}.url")
+    end
+    
+    def url
+      "http://#{host}:#{port}"
     end
     
     def log_file
@@ -71,12 +84,27 @@ module Vegas
       end
     end
     
-    def port_open?
+    def port_open?(check_url = nil)
       begin
-        open("http://#{host}:#{port}")
+        open(check_url || url)
         false
       rescue Errno::ECONNREFUSED => e
         true
+      end
+    end
+    
+    def write_url
+      File.open(url_file, 'w') {|f| f << url }
+    end
+    
+    def check_for_running
+      if File.exists?(pid_file) && File.exists?(url_file)
+        running_url = File.read(url_file)
+        if !port_open?(running_url)
+          logger.warn "== #{app_name} is already running at #{running_url}"
+          launch!(running_url)
+          exit!
+        end
       end
     end
     
@@ -109,8 +137,8 @@ module Vegas
       at_exit { File.delete(pid_file) if File.exist?(pid_file) }
     end
     
-    def launch!
-      Launchy.open("http://#{host}:#{port}")
+    def launch!(specific_url = nil)
+      Launchy.open(specific_url || url)
     end
     
     def kill!
