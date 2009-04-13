@@ -1,0 +1,32 @@
+= vegas
+
+http://code.quirkey.com/vegas
+
+== DESCRIPTION:
+
+Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps.
+
+== FEATURES/PROBLEMS:
+
+Currently, Vegas just includes a single class Vegas::Runner which wraps your Sinatra app to give it command line options, daemonization, PID/URL tracking, and browser launching (using Launchy).
+
+Lets say you have a gem with a sinatra application. With Vegas you can create a bin that looks like
+  
+  #!/usr/bin/env ruby
+  # ./bin/myapp
+  
+  require File.expand_path(File.dirname(__FILE__) + "/../lib/myapp")
+  require 'vegas'
+  
+  Vegas::Runner.new(Sinatra::Application, 'myapp')
+  
+
+See the website: http://code.quirkey.com/vegas for full usage/options.
+
+== INSTALL:
+
+  sudo gem install vegas
+
+== LICENSE:
+
+MIT LICENSE, see /LICENSE for details
