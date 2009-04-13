@@ -221,7 +221,8 @@ module Vegas
           if app.respond_to?(:version)
             puts "#{app_name} #{app.version}"
           end
-          puts "Vegas #{Vegas::VERSION}"
+          puts "sinatra #{Sinatra::VERSION}"
+          puts "vegas #{Vegas::VERSION}"
           exit
         end
 
