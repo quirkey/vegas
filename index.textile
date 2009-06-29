@@ -32,6 +32,7 @@ Lets say you have a Sinatra app that looks like:
 
 {% highlight ruby %}
 # /my_app.rb
+require 'rubygems'
 require 'sinatra'
 
 class MyApp < Sinatra::Default
@@ -46,13 +47,13 @@ end
 You can turn this into a simple binary:
 
 {% highlight ruby %}
-#!/usr/bin/env ruby
-# /myapp
+  #!/usr/bin/env ruby
+  # /myapp
 
-require File.expand_path(File.dirname(__FILE__) + 'myapp.rb')
-require 'vegas'
+  require File.expand_path(File.dirname(__FILE__) + 'myapp.rb')
+  require 'vegas'
 
-Vegas::Runner.new(MyApp, 'my_app')
+  Vegas::Runner.new(MyApp, 'my_app')
 {% endhighlight %}
 
 Now if you run @./my_app@ it should:
