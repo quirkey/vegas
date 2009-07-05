@@ -6,11 +6,9 @@ require File.dirname(__FILE__) + '/lib/vegas'
 $hoe = Hoe.new('vegas', Vegas::VERSION) do |p|
   p.developer('Aaron Quint', 'aaron@quirkey.com')
   p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  p.post_install_message = 'PostInstall.txt' # TODO remove if post-install message not required
   p.rubyforge_name       = 'quirkey'
   p.extra_deps         = [
-    ['sinatra','>= 0.9.1'],
-    ['launchy','>= 0.3.3']
+    ['sinatra','>= 0.9.1']
   ]
   p.extra_dev_deps = [
     ['newgem', ">= #{::Newgem::VERSION}"],

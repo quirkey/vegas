@@ -1,13 +1,21 @@
 require 'open-uri'
 require 'logger'
 
+if Vegas::WINDOWS
+  begin
+    require 'win32/process'
+  rescue 
+    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:\n gem install win32-process"
+  end
+end
+
 module Vegas
   class Runner
     attr_reader :app, :app_name, :rack_handler, :port, :host, :options
     
     ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
     PORT       = 5678
-    HOST       = '0.0.0.0'
+    HOST       = WINDOWS ? 'localhost' : '0.0.0.0'
     
     def initialize(app, app_name, set_options = {}, &block)
       # initialize
@@ -29,18 +37,19 @@ module Vegas
       # initialize app dir
       FileUtils.mkdir_p(app_dir)
       
-      logger.info "== Starting #{app_name}"
+      logger.info "Running with Windows Settings" if WINDOWS
+      logger.info "Starting #{app_name}"
       
       check_for_running
       find_port
       write_url
-      launch!
       
       begin
+        launch!
         daemonize! unless options[:foreground]      
         run!
       rescue RuntimeError => e
-        logger.warn "== There was an error starting #{app_name}: #{e}"
+        logger.warn "There was an error starting #{app_name}: #{e}"
         exit
       end
     end
@@ -72,14 +81,14 @@ module Vegas
     def find_port
       if @port = options[:port]
         if !port_open?
-          logger.warn "== Port #{port} is already in use. Please try another or don't use -P, for auto-port"
+          logger.warn "Port #{port} is already in use. Please try another or don't use -P, for auto-port"
         end
       else
         @port = PORT
-        logger.info "== Trying to start #{app_name} on Port #{port}"
+        logger.info "Trying to start #{app_name} on Port #{port}"
         while !port_open?
           @port += 1
-          logger.info "== Trying to start #{app_name} on Port #{port}"
+          logger.info "Trying to start #{app_name} on Port #{port}"
         end
       end
     end
@@ -101,7 +110,7 @@ module Vegas
       if File.exists?(pid_file) && File.exists?(url_file)
         running_url = File.read(url_file)
         if !port_open?(running_url)
-          logger.warn "== #{app_name} is already running at #{running_url}"
+          logger.warn "#{app_name} is already running at #{running_url}"
           launch!(running_url)
           exit!
         end
@@ -110,10 +119,11 @@ module Vegas
     
     def run!
       rack_handler.run app, :Host => host, :Port => port do |server|
-        trap(:INT) do
+        trap(kill_command) do
           ## Use thins' hard #stop! if available, otherwise just #stop
           server.respond_to?(:stop!) ? server.stop! : server.stop
-          logger.info "== #{app_name} received INT ... stopping : #{Time.now}"
+          logger.info "#{app_name} received INT ... stopping"
+          delete_pid!
         end
       end
     end
@@ -121,52 +131,54 @@ module Vegas
     # Adapted from Rackup
     def daemonize!
       if RUBY_VERSION < "1.9"
-        exit if fork
-        Process.setsid
-        exit if fork
+        logger.debug "Parent Process: #{Process.pid}"
+        exit! if fork
+        logger.debug "Child Process: #{Process.pid}"
         Dir.chdir "/"
         File.umask 0000
-        STDIN.reopen  "/dev/null"
+        FileUtils.touch(log_file)
+        STDIN.reopen  log_file
         STDOUT.reopen log_file, "a"
         STDERR.reopen log_file, "a"
       else
         Process.daemon
       end
+      logger.debug "Child Process: #{Process.pid}"
 
-      File.open(pid_file, 'w'){ |f| f.write("#{Process.pid}") }
-      at_exit { File.delete(pid_file) if File.exist?(pid_file) }
+      File.open(pid_file, 'w') {|f| f.write("#{Process.pid}") }
+      at_exit { delete_pid! }
     end
     
     def launch!(specific_url = nil)
-      Launchy.open(specific_url || url)
+      # Launchy.open(specific_url || url)
+      cmd = WINDOWS ? "start" : "sleep 2 && open"
+      system "#{cmd} #{specific_url || url}"
     end
     
     def kill!
       pid = File.read(pid_file)
-      if pid
-        logger.warn "== Sending INT to #{pid}"
-        Process.kill('INT', pid.to_i)
-      else
-        logger.warn "== pid not found at #{pid_file}"
-      end
+      logger.warn "Sending INT to #{pid.to_i}"
+      Process.kill(kill_command, pid.to_i)
+    rescue => e
+      logger.warn "pid not found at #{pid_file} : #{e}"
     end
     
     def status
       if File.exists?(pid_file)
-        logger.info "== #{app_name} running"
-        logger.info "== PID #{File.read(pid_file)}"
-        logger.info "== URL #{File.read(url_file)}" if File.exists?(url_file)
+        logger.info "#{app_name} running"
+        logger.info "PID #{File.read(pid_file)}"
+        logger.info "URL #{File.read(url_file)}" if File.exists?(url_file)
       else
-        logger.info "== #{app_name} not running!"
+        logger.info "#{app_name} not running!"
       end
     end
 
-    def self.logger
-      @logger ||= Logger.new(STDOUT)
-    end
-    
     def logger
-      self.class.logger
+      return @logger if @logger
+      @logger = Logger.new(STDOUT)
+      @logger.level     = options[:debug] ? Logger::DEBUG : Logger::INFO
+      @logger.formatter = Proc.new {|s, t, n, msg| "[#{t}] #{msg}\n"}
+      @logger
     end
     
     private
@@ -206,6 +218,10 @@ module Vegas
           status
           exit!
         }
+        
+        opts.on('-d', "--debug", "raise the log level to :debug (default: :info)") {|s| 
+          @options[:debug] = true
+        }
                 
         yield opts if block_given?
         
@@ -228,9 +244,17 @@ module Vegas
 
         opts.parse! ARGV
       }
+    rescue OptionParser::MissingArgument => e
+      logger.warn "#{e}, run -h for options"
+      exit
     end
     
+    def kill_command
+      WINDOWS ? 1 : :INT
+    end
     
-    
+    def delete_pid!
+      File.delete(pid_file) if File.exist?(pid_file)
+    end
   end
 end
