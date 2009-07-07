@@ -2,7 +2,7 @@
 layout: quirkey_code
 title: vegas
 github_name: vegas
-current_version: 0.0.1
+current_version: 0.0.3
 nav:
   - name: What
     link: "#what"
@@ -23,6 +23,8 @@ Vegas aims to solve the simple problem of creating executable versions of Sinatr
 h3(#why). Why
 
 I have a vision of a future where all us developers release gems with simple local web interfaces powered by Sinatra. I see Vegas as a little shove and an easy first step in making this vision come true. 
+
+I presented about "Sinatra: The Framework Within" at GoGaRuCo 2009: "Check out the full video.":http://pivotallabs.com/talks/51-sinatra-the-framework-within
 
 h3(#usage). Usage
 
@@ -72,9 +74,12 @@ Vegas::Runner.new(AppClass, 'app_name') do |opts, app|
 end
 {% endhighlight %}
 
+As of version 0.0.3, Vegas::Runner and its daemonization is fully compatible with Windows.
+
 h3(#dependencies). Dependencies
 
 Vegas requires:
 
 * sinatra >= 0.9.1
-* launchy >= 0.3.3
+
+On Windows, there is an additional requirement of the @win32-process@ gem.
