@@ -1,3 +1,12 @@
+== 0.0.3 2009-07-06
+
+* Vegas::Runner is now Windows compatible (require win32-process gem)
+  * Includes daemon-ization
+  * PID tracking
+  * Vegas::WINDOWS is a top level boolean
+* Vegas is no longer dependent on Launchy 
+  * launching browser is done simply with open/start depending on platform
+  
 == 0.0.1 2009-04-13
 
 * 1 major enhancement:

@@ -29,4 +29,4 @@ See the website: http://code.quirkey.com/vegas for full usage/options.
 
 == LICENSE:
 
-MIT LICENSE, see /LICENSE for details
+MIT LICENSE, see LICENSE for details
