@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'logger'
+require 'optparse'
 
 if Vegas::WINDOWS
   begin
