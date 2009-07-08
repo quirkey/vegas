@@ -23,6 +23,19 @@ Lets say you have a gem with a sinatra application. With Vegas you can create a 
 
 See the website: http://code.quirkey.com/vegas for full usage/options.
 
+=== WINDOWS:
+
+Using vegas (and gems that depend on it) on Windows works but isn't 100% the same. 
+Daemon-ization and browser launching work, but you will see duplicate messages.
+
+If you see a warning like:
+
+  `expand_path': couldn't find HOME environment -- expanding `~/.vegas' (ArgumentError)
+
+You have to set your HOME path:
+
+  c:\> set HOME=%HOMEPATH%
+
 == INSTALL:
 
   sudo gem install vegas
