@@ -46,7 +46,7 @@ module Vegas
       write_url
       
       begin
-        launch!    unless options[:skip_launch]
+        launch!    
         daemonize! unless options[:foreground]      
         run!
       rescue RuntimeError => e
@@ -151,6 +151,7 @@ module Vegas
     end
     
     def launch!(specific_url = nil)
+      return if options[:skip_launch]
       cmd = WINDOWS ? "start" : "sleep 2 && open"
       system "#{cmd} #{specific_url || url}"
     end
