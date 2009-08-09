@@ -1,11 +1,18 @@
-require 'rubygems'
-require 'bacon'
-require 'sinatra'
-require 'rack/test'
+dependencies = %w{
+  bacon
+  sinatra
+  rack/test
+  nokogiri
+}
+
+begin
+  dependencies.each {|f| require f }
+rescue LoadError
+  require 'rubygems'
+  dependencies.each {|f| require f }
+end
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'vegas.rb')
-
-require 'nokogiri'
 
 module TestHelper
   def rackup(app)

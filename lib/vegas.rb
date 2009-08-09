@@ -1,5 +1,9 @@
-require 'rubygems'
-require 'sinatra'
+begin
+  require 'sinatra'
+rescue LoadError
+  require 'rubygems'
+  require 'sinatra'
+end
 
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
