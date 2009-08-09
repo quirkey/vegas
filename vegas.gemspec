@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Quint"]
   s.date = %q{2009-08-09}
-  s.description = %q{}
+  s.description = %q{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps. It includes a class Vegas::Runner that wraps Rack/Sinatra applications and provides a simple command line interface and launching mechanism.}
   s.email = ["aaron@quirkey.com"]
   s.extra_rdoc_files = ["History.txt"]
   s.files = ["History.txt", "LICENSE", "README.rdoc", "lib/vegas.rb", "lib/vegas/runner.rb", "test/test_app/test_app.rb", "test/test_apps.rb", "test/test_helper.rb", "test/test_vegas_runner.rb"]
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{quirkey}
   s.rubygems_version = %q{1.3.5}
-  s.summary = nil
+  s.summary = %q{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps.}
   s.test_files = ["test/test_app/test_app.rb", "test/test_apps.rb", "test/test_helper.rb", "test/test_vegas_runner.rb"]
 
   if s.respond_to? :specification_version then

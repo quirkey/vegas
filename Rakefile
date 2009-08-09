@@ -3,9 +3,12 @@ require File.dirname(__FILE__) + '/lib/vegas'
 
 # Generate all the Rake tasks
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
-$hoe = Hoe.new('vegas', Vegas::VERSION) do |p|
+$hoe = Hoe.spec('vegas') do |p|
+  p.version              = Vegas::VERSION
   p.developer('Aaron Quint', 'aaron@quirkey.com')
   p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
+  p.summary              = "Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps."
+  p.description          = %{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps. It includes a class Vegas::Runner that wraps Rack/Sinatra applications and provides a simple command line interface and launching mechanism.}
   p.rubyforge_name       = 'quirkey'
   p.extra_deps         = [
     ['sinatra','>= 0.9.1']
