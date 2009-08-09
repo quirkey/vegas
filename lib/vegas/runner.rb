@@ -151,6 +151,7 @@ module Vegas
     end
     
     def launch!(specific_url = nil)
+      return if @options[:skip_launch]
       # Launchy.open(specific_url || url)
       cmd = WINDOWS ? "start" : "sleep 2 && open"
       system "#{cmd} #{specific_url || url}"
@@ -209,7 +210,11 @@ module Vegas
         opts.on("-F", "--foreground", "don't daemonize, run in the foreground") { |f|
           @options[:foreground] = true
         }
-        
+
+        opts.on("-L", "--no-launch", "don't launch the browser") { |f|
+          @options[:skip_launch] = true
+        }
+
         opts.on('-K', "--kill", "kill the running process and exit") {|k| 
           kill!
           exit
