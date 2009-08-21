@@ -29,7 +29,7 @@ module Vegas
         if block_given?
           opts.separator ''
           opts.separator "#{app_name} options:"
-          yield(opts, app)
+          yield(self, opts, app)
         end
       end
       # set app options
@@ -44,15 +44,7 @@ module Vegas
       check_for_running
       find_port
       write_url
-      
-      begin
-        launch!    
-        daemonize! unless options[:foreground]      
-        run!
-      rescue RuntimeError => e
-        logger.warn "There was an error starting #{app_name}: #{e}"
-        exit
-      end
+      start
     end
     
     def app_dir
@@ -162,6 +154,17 @@ module Vegas
       Process.kill(kill_command, pid.to_i)
     rescue => e
       logger.warn "pid not found at #{pid_file} : #{e}"
+    end
+    
+    def start
+      begin
+        launch!    
+        daemonize! unless options[:foreground]      
+        run!
+      rescue RuntimeError => e
+        logger.warn "There was an error starting #{app_name}: #{e}"
+        exit
+      end
     end
     
     def status
