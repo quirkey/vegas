@@ -38,6 +38,8 @@ module Vegas
       # initialize app dir
       FileUtils.mkdir_p(app_dir)
       
+      return if options[:start] === false
+      
       logger.info "Running with Windows Settings" if WINDOWS
       logger.info "Starting #{app_name}"
       
