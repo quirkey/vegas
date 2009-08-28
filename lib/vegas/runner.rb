@@ -175,12 +175,23 @@ module Vegas
       end
     end
 
-    def logger
-      return @logger if @logger
-      @logger = Logger.new(STDOUT)
-      @logger.level     = options[:debug] ? Logger::DEBUG : Logger::INFO
-      @logger.formatter = Proc.new {|s, t, n, msg| "[#{t}] #{msg}\n"}
+    def self.logger=(logger)
+      @logger = logger
+    end
+
+    def self.logger
+      @logger ||= LOGGER
+      if !@logger
+        @logger           = Logger.new(STDOUT)
+        @logger.level     = options[:debug] ? Logger::DEBUG : Logger::INFO
+        @logger.formatter = Proc.new {|s, t, n, msg| "[#{t}] #{msg}\n"}
+        @logger
+      end
       @logger
+    end
+
+    def logger
+      self.class.logger
     end
 
     private
