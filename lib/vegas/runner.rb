@@ -12,67 +12,74 @@ end
 
 module Vegas
   class Runner
-    attr_reader :app, :app_name, :rack_handler, :port, :host, :options
-    
+    attr_reader :app, :app_name, :rack_handler, :port, :host, :options, :args
+
     ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
     PORT       = 5678
     HOST       = WINDOWS ? 'localhost' : '0.0.0.0'
-    
-    def initialize(app, app_name, set_options = {}, &block)
+
+    def initialize(app, app_name, set_options = {}, runtime_args = ARGV, &block)
       # initialize
       @app          = app
       @app_name     = app_name
       @options      = set_options || {}
-      @rack_handler = @app.send :detect_rack_handler
+      @runtime_args = runtime_args
+      @rack_handler = @app.respond_to?(:detect_rack_handler) ? 
+        @app.send(:detect_rack_handler) : Rack::Handler.get('thin')
       # load options from opt parser
-      define_options do |opts|
+      @args = define_options do |opts|
         if block_given?
           opts.separator ''
           opts.separator "#{app_name} options:"
           yield(self, opts, app)
         end
       end
+
       # set app options
       @host = options[:host] || HOST
-      @app.set options
+      @app.set(options) if @app.respond_to?(:set)
       # initialize app dir
       FileUtils.mkdir_p(app_dir)
-      
       return if options[:start] === false
-      
-      logger.info "Running with Windows Settings" if WINDOWS
-      logger.info "Starting #{app_name}"
-      
-      check_for_running
-      find_port
-      write_url
       start
     end
-    
+
     def app_dir
       File.join(ROOT_DIR, app_name)
     end
-    
+
     def pid_file
       File.join(app_dir, "#{app_name}.pid")
     end
-    
+
     def url_file
       File.join(app_dir, "#{app_name}.url")
     end
-    
+
     def url
       "http://#{host}:#{port}"
     end
-    
+
     def log_file
       File.join(app_dir, "#{app_name}.log")
     end
-    
-    def handler_name
-      rack_handler.name.gsub(/.*::/, '')
+
+    def start(path = nil)
+      logger.info "Running with Windows Settings" if WINDOWS
+      logger.info "Starting #{app_name}"
+      begin
+        check_for_running(path)
+        find_port
+        write_url
+        launch!(url, path)
+        daemonize! unless options[:foreground]      
+        run!
+      rescue RuntimeError => e
+        logger.warn "There was an error starting #{app_name}: #{e}"
+        exit
+      end
     end
-        
+
     def find_port
       if @port = options[:port]
         if !port_open?
@@ -87,7 +94,7 @@ module Vegas
         end
       end
     end
-    
+
     def port_open?(check_url = nil)
       begin
         open(check_url || url)
@@ -96,22 +103,22 @@ module Vegas
         true
       end
     end
-    
+
     def write_url
       File.open(url_file, 'w') {|f| f << url }
     end
-    
-    def check_for_running
+
+    def check_for_running(path = nil)
       if File.exists?(pid_file) && File.exists?(url_file)
         running_url = File.read(url_file)
         if !port_open?(running_url)
           logger.warn "#{app_name} is already running at #{running_url}"
-          launch!(running_url)
+          launch!(running_url, path)
           exit!
         end
       end
     end
-    
+
     def run!
       rack_handler.run app, :Host => host, :Port => port do |server|
         trap(kill_command) do
@@ -122,7 +129,7 @@ module Vegas
         end
       end
     end
-    
+
     # Adapted from Rackup
     def daemonize!
       if RUBY_VERSION < "1.9"
@@ -143,13 +150,13 @@ module Vegas
       File.open(pid_file, 'w') {|f| f.write("#{Process.pid}") }
       at_exit { delete_pid! }
     end
-    
-    def launch!(specific_url = nil)
+
+    def launch!(specific_url = nil, path = nil)
       return if options[:skip_launch]
-      cmd = WINDOWS ? "start" : "sleep 2 && open"
-      system "#{cmd} #{specific_url || url}"
+      cmd = WINDOWS ? "start" : "open"
+      system "#{cmd} #{specific_url || url}#{path}"
     end
-    
+
     def kill!
       pid = File.read(pid_file)
       logger.warn "Sending INT to #{pid.to_i}"
@@ -157,18 +164,7 @@ module Vegas
     rescue => e
       logger.warn "pid not found at #{pid_file} : #{e}"
     end
-    
-    def start
-      begin
-        launch!    
-        daemonize! unless options[:foreground]      
-        run!
-      rescue RuntimeError => e
-        logger.warn "There was an error starting #{app_name}: #{e}"
-        exit
-      end
-    end
-    
+
     def status
       if File.exists?(pid_file)
         logger.info "#{app_name} running"
@@ -186,19 +182,19 @@ module Vegas
       @logger.formatter = Proc.new {|s, t, n, msg| "[#{t}] #{msg}\n"}
       @logger
     end
-    
+
     private
     def define_options
-      OptionParser.new("", 24, '  ') { |opts|
+      OptionParser.new("", 24, '  ') do |opts|
         opts.banner = "Usage: #{app_name} [options]"
 
         opts.separator ""
         opts.separator "Vegas options:"
-                
+
         opts.on("-s", "--server SERVER", "serve using SERVER (webrick/mongrel)") { |s|
           @rack_handler = Rack::Handler.get(s)
         }
-        
+
         opts.on("-o", "--host HOST", "listen on HOST (default: #{HOST})") { |host|
           @options[:host] = host
         }
@@ -223,18 +219,18 @@ module Vegas
           kill!
           exit
         }
-        
+
         opts.on('-S', "--status", "display the current running PID and URL then quit") {|s| 
           status
           exit!
         }
-        
+
         opts.on('-d', "--debug", "raise the log level to :debug (default: :info)") {|s| 
           @options[:debug] = true
         }
-                
+
         yield opts if block_given?
-        
+
         opts.separator ""
         opts.separator "Common options:"
 
@@ -252,19 +248,19 @@ module Vegas
           exit
         end
 
-        opts.parse! ARGV
-      }
+      end.parse! @runtime_args
     rescue OptionParser::MissingArgument => e
       logger.warn "#{e}, run -h for options"
       exit
     end
-    
+
     def kill_command
       WINDOWS ? 1 : :INT
     end
-    
+
     def delete_pid!
       File.delete(pid_file) if File.exist?(pid_file)
     end
   end
+  
 end
