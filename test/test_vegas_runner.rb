@@ -4,7 +4,7 @@ Vegas::Runner::ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
 
 describe 'Vegas::Runner' do
   before do
-    FileUtils.rm_rf(Vegas::Runner::ROOT_DIR)
+    FileUtils.rm_rf(File.join(File.dirname(__FILE__), 'tmp'))
     @log = StringIO.new
     Vegas::Runner.logger = Logger.new(@log)
   end
