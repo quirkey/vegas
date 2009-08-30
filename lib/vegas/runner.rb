@@ -20,10 +20,12 @@ module Vegas
 
     def initialize(app, app_name, set_options = {}, runtime_args = ARGV, &block)
       # initialize
-      @app          = app
-      @app_name     = app_name
-      @options      = set_options || {}
-      @runtime_args = runtime_args
+      @app                    = app
+      @app_name               = app_name
+      @options                = set_options || {}
+      @runtime_args           = runtime_args
+      self.class.logger.level = options[:debug] ? Logger::DEBUG : Logger::INFO
+            
       @rack_handler = @app.respond_to?(:detect_rack_handler) ? 
         @app.send(:detect_rack_handler) : Rack::Handler.get('thin')
       # load options from opt parser
@@ -41,7 +43,13 @@ module Vegas
       # initialize app dir
       FileUtils.mkdir_p(app_dir)
       return if options[:start] === false
-      start
+      # evaluate the launch_path
+      path = if options[:launch_path] && options[:launch_path].respond_to?(:call)
+        options[:launch_path].call(self)
+      else
+        options[:launch_path]
+      end
+      start(path)
     end
 
     def app_dir
@@ -180,10 +188,9 @@ module Vegas
     end
 
     def self.logger
-      @logger ||= LOGGER
+      @logger ||= LOGGER if defined?(LOGGER)
       if !@logger
         @logger           = Logger.new(STDOUT)
-        @logger.level     = options[:debug] ? Logger::DEBUG : Logger::INFO
         @logger.formatter = Proc.new {|s, t, n, msg| "[#{t}] #{msg}\n"}
         @logger
       end

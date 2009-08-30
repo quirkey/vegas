@@ -1,9 +1,8 @@
 dependencies = %w{
   bacon
-  mocha
+  mocha/standalone
+  mocha/object
   sinatra
-  rack/test
-  nokogiri
 }
 
 begin
@@ -18,13 +17,10 @@ require File.join(File.dirname(__FILE__), 'test_apps.rb')
 
 
 module TestHelper
-  def rackup(app)
-    Rack::Test::Session.new(app)
-  end
   
   def vegas(*args, &block)
     Vegas::Runner.any_instance.stubs(:daemonize!).once
-    Rack::Handler::Thin.stubs(:run).once    
+    Rack::Handler::Thin.stubs(:run).once
     @vegas = Vegas::Runner.new(*args, &block)
   end
   
@@ -53,26 +49,3 @@ module TestHelper
 end
 
 Bacon::Context.send(:include, TestHelper)
-
-class Should
-
-  def have_element(search, content = nil)
-    satisfy "have element matching #{search}" do
-      doc = Nokogiri.parse(@object.to_s)
-      node_set = doc.search(search)
-      if node_set.empty?
-        false
-      else
-        collected_content = node_set.collect {|t| t.content }.join(' ')
-        case content
-        when Regexp
-          collected_content =~ content
-        when String
-          collected_content.include?(content)
-        when nil
-          true
-        end
-      end
-    end
-  end
-end

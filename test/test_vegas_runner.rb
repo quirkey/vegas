@@ -13,7 +13,8 @@ describe 'Vegas::Runner' do
 
     describe 'with basic usage' do
       before do
-        vegas(TestApp1, 'vegas_test_app_1', {:skip_launch => true, :sessions => true}, ["route","--debug"])
+        Vegas::Runner.any_instance.expects(:system).once
+        vegas(TestApp1, 'vegas_test_app_1', {:sessions => true}, ["route","--debug"])
       end
 
       it "sets app" do
@@ -43,12 +44,12 @@ describe 'Vegas::Runner' do
       it "writes a url with the port" do
         @vegas.url_file.should have_matching_file_content(/0.0.0.0\:#{@vegas.port}/)
       end
-
     end
 
     describe 'with a sinatra app' do
       before do
-        TestApp1.expects(:detect_rack_handler).once.returns(Rack::Handler::Mongrel)
+        TestApp1.expects(:detect_rack_handler).returns(Rack::Handler::Mongrel)
+        Vegas::Runner.any_instance.expects(:system).once
         Rack::Handler::Mongrel.stubs(:run)
         vegas(TestApp1, 'vegas_test_app_1', {:skip_launch => true, :sessions => true}, ["route","--debug"])
       end
@@ -70,9 +71,31 @@ describe 'Vegas::Runner' do
       
       it "sets default rack handler to thin" do
         @vegas.rack_handler.should == Rack::Handler::Thin
-      end
-      
+      end      
     end
+    
+    describe 'with a launch path specified as a proc' do      
+      it 'evaluates the proc in the context of the runner' do
+        Vegas::Runner.any_instance.expects(:system).once.with {|s| s =~ /\?search\=blah$/ }
+        vegas(TestApp2, 
+              'vegas_test_app_2', 
+              {:launch_path => Proc.new {|r| "?search=#{r.args.first}" }}, 
+              ["--debug", "blah"])
+        @vegas.options[:launch_path].should.be instance_of(Proc)
+      end      
+    end
+    
+    describe 'with a launch path specified as string' do
+      it 'launches to the specific path' do
+        Vegas::Runner.any_instance.expects(:system).once.with {|s| s =~ /\?search\=blah$/ }
+        vegas(TestApp2, 
+              'vegas_test_app_2', 
+              {:launch_path => "?search=blah"}, 
+              ["--debug", "blah"])
+        @vegas.options[:launch_path].should == "?search=blah"
+      end
+    end
+    
 
   end
 

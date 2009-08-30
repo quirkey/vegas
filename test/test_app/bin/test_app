@@ -6,4 +6,4 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'test_app.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'lib','vegas.rb'))
 
-vegas = Vegas::Runner.new(TestApp, 'test_app')
+vegas = Vegas::Runner.new(TestApp, 'test_app', :launch_path => lambda {|r| "/#{r.args.first}" })
