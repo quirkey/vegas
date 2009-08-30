@@ -68,7 +68,8 @@ Now if you run @./my_app@ it should:
 Running it with @-h@ or @--help@ will print a list of available command line options. You can even add options specific to your app by using a block.
 
 {% highlight ruby %}
-Vegas::Runner.new(AppClass, 'app_name') do |opts, app|
+Vegas::Runner.new(AppClass, 'app_name') do |runner, opts, app|
+  # runner is the instance of Vegas::Runner
   # opts is an option parser object
   # app is your app class
 end
