@@ -2,7 +2,7 @@
 layout: quirkey_code
 title: vegas
 github_name: vegas
-current_version: 0.0.3
+current_version: 0.1.0
 nav:
   - name: What
     link: "#what"
@@ -76,10 +76,16 @@ end
 
 As of version 0.0.3, Vegas::Runner and its daemonization is fully compatible with Windows.
 
+h4. Rack Apps
+
+Vegas (> v0.1.0) is not dependent on Sinatra. Vegas works almost exactly the same for general Rack Applications. For example:
+
+
+
 h3(#dependencies). Dependencies
 
 Vegas requires:
 
-* sinatra >= 0.9.1
+* rack >= 0.1.0
 
 On Windows, there is an additional requirement of the @win32-process@ gem.
