@@ -78,8 +78,19 @@ As of version 0.0.3, Vegas::Runner and its daemonization is fully compatible wit
 
 h4. Rack Apps
 
-Vegas (> v0.1.0) is not dependent on Sinatra. Vegas works almost exactly the same for general Rack Applications. For example:
+Vegas (> v0.1.0) is not dependent on Sinatra. Vegas works almost exactly the same for general Rack Applications. For example, this will work as expected:
 
+{% highlight ruby %}
+#!/usr/bin/env ruby
+
+require 'vegas'
+
+app = Proc.new {|env| 
+  [200, {'Content-Type' => 'text/plain'}, ["This is an app. #{env.inspect}"]]
+}
+
+Vegas::Runner.new(app, 'rack_app')
+{% endhighlight %}
 
 
 h3(#dependencies). Dependencies
