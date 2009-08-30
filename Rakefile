@@ -1,4 +1,4 @@
-%w[rubygems rake rake/clean hoe fileutils newgem rubigen].each { |f| require f }
+%w[rubygems rake rake/clean hoe fileutils].each { |f| require f }
 require File.dirname(__FILE__) + '/lib/vegas'
 
 # Generate all the Rake tasks
@@ -11,10 +11,9 @@ $hoe = Hoe.spec('vegas') do |p|
   p.description          = %{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps. It includes a class Vegas::Runner that wraps Rack/Sinatra applications and provides a simple command line interface and launching mechanism.}
   p.rubyforge_name       = 'quirkey'
   p.extra_deps         = [
-    ['sinatra','>= 0.9.1']
+    ['rack','= 1.0']
   ]
   p.extra_dev_deps = [
-    ['newgem', ">= #{::Newgem::VERSION}"],
     ['nokogiri', ">= 1.0.6"],
     ['bacon', ">= 1.1.0"]
   ]
@@ -25,7 +24,6 @@ $hoe = Hoe.spec('vegas') do |p|
   p.rsync_args = '-av --delete --ignore-errors'
 end
 
-require 'newgem/tasks' # load /tasks/*.rake
 Dir['tasks/**/*.rake'].each { |t| load t }
 
 # TODO - want other tests/tasks run by default? Add them to the list

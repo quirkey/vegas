@@ -209,7 +209,7 @@ module Vegas
         opts.separator ""
         opts.separator "Vegas options:"
 
-        opts.on("-s", "--server SERVER", "serve using SERVER (webrick/mongrel)") { |s|
+        opts.on("-s", "--server SERVER", "serve using SERVER (thin/mongrel/webrick)") { |s|
           @rack_handler = Rack::Handler.get(s)
         }
 
@@ -261,7 +261,8 @@ module Vegas
           if app.respond_to?(:version)
             puts "#{app_name} #{app.version}"
           end
-          puts "sinatra #{Sinatra::VERSION}"
+          puts "rack #{Rack::VERSION.join('.')}"
+          puts "sinatra #{Sinatra::VERSION}" if defined?(Sinatra)
           puts "vegas #{Vegas::VERSION}"
           exit
         end

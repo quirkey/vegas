@@ -1,14 +1,14 @@
 begin
-  require 'sinatra'
+  require 'rack'
 rescue LoadError
   require 'rubygems'
-  require 'sinatra'
+  require 'rack'
 end
 
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
 module Vegas
-  VERSION = "0.0.4.1"
+  VERSION = "0.1.0"
   WINDOWS = !!(RUBY_PLATFORM =~ /(mingw|bccwin|wince|mswin32)/i)
   
   autoload :Runner, 'vegas/runner'
