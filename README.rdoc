@@ -8,7 +8,7 @@ Vegas aims to solve the simple problem of creating executable versions of Sinatr
 
 == FEATURES/PROBLEMS:
 
-Currently, Vegas just includes a single class Vegas::Runner which wraps your Sinatra app to give it command line options, daemonization, PID/URL tracking, and browser launching (using Launchy).
+Currently, Vegas just includes a single class Vegas::Runner which wraps your Sinatra app to give it command line options, daemon-ization, PID/URL tracking, and browser launching.
 
 Lets say you have a gem with a sinatra application. With Vegas you can create a bin that looks like
   

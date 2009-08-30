@@ -14,8 +14,8 @@ $hoe = Hoe.spec('vegas') do |p|
     ['rack','= 1.0']
   ]
   p.extra_dev_deps = [
-    ['nokogiri', ">= 1.0.6"],
-    ['bacon', ">= 1.1.0"]
+    ['bacon', ">= 1.1.0"],
+    ['mocha', ">= 0.9.7"]
   ]
   
   p.clean_globs |= %w[**/.DS_Store tmp *.log]

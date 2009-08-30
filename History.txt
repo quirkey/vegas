@@ -1,3 +1,13 @@
+== 0.1.0 2009-08-30
+
+* New:
+  * options[:start] = false will keep the app from actually starting (useful for defining your own start/stop commands)
+  * options[:launch_path] Takes a string or an object that responds to call (proc/lambda) that gets the runner as its only argument. This allows you to easily manipulate options or args to launch the app to a specific path. See latest gembox for example.
+* Changed:
+  * Sinatra is no longer a dependency! Vegas can now run pure Rack apps.
+  * All methods for starting an app are grouped into Runner#start
+  * launch! and start both take an optional path string to launch the app to.
+
 == 0.0.4 2009-08-09
 
 * new -L (--skip-launch) option doesn't launch the web browser (thanks bmabey!)
