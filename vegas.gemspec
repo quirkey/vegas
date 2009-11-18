@@ -20,11 +20,11 @@ Gem::Specification.new do |s|
     ".gitignore",
      "History.txt",
      "LICENSE",
-     "Manifest.txt",
      "README.rdoc",
      "Rakefile",
      "lib/vegas.rb",
      "lib/vegas/runner.rb",
+     "test/apps.rb",
      "test/test_app/bin/test_app",
      "test/test_app/bin/test_rack_app",
      "test/test_app/test_app.rb",
@@ -52,16 +52,16 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
       s.add_development_dependency(%q<bacon>, [">= 1.1.0"])
-      s.add_development_dependency(%q<bacon>, [">= 0.9.7"])
+      s.add_development_dependency(%q<sinatra>, [">= 0.9.4"])
     else
       s.add_dependency(%q<rack>, [">= 1.0.0"])
       s.add_dependency(%q<bacon>, [">= 1.1.0"])
-      s.add_dependency(%q<bacon>, [">= 0.9.7"])
+      s.add_dependency(%q<sinatra>, [">= 0.9.4"])
     end
   else
     s.add_dependency(%q<rack>, [">= 1.0.0"])
     s.add_dependency(%q<bacon>, [">= 1.1.0"])
-    s.add_dependency(%q<bacon>, [">= 0.9.7"])
+    s.add_dependency(%q<sinatra>, [">= 0.9.4"])
   end
 end
 
