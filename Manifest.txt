@@ -1,5 +1,0 @@
-History.txt
-LICENSE
-README.rdoc
-lib/vegas.rb
-lib/vegas/runner.rb

@@ -1,3 +1,7 @@
+== 0.1.1 2009-11-18
+
+* Repackaged with Jeweler, fixed dependency issues and removed other dev artifacts
+
 == 0.1.0 2009-08-30
 
 * New:

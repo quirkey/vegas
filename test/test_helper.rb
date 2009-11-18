@@ -13,7 +13,7 @@ rescue LoadError
 end
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'vegas.rb')
-require File.join(File.dirname(__FILE__), 'test_apps.rb')
+require File.join(File.dirname(__FILE__), 'apps.rb')
 
 
 module TestHelper
