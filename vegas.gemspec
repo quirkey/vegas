@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{vegas}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Quint"]
-  s.date = %q{2009-11-18}
+  s.date = %q{2009-12-28}
   s.description = %q{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps. It includes a class Vegas::Runner that wraps Rack/Sinatra applications and provides a simple command line interface and launching mechanism.}
   s.email = ["aaron@quirkey.com"]
   s.extra_rdoc_files = [
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "lib/vegas.rb",
      "lib/vegas/runner.rb",
+     "pkg/vegas-0.1.1.gem",
      "test/apps.rb",
      "test/test_app/bin/test_app",
      "test/test_app/bin/test_rack_app",
