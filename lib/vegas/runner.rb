@@ -199,7 +199,7 @@ module Vegas
       config = File.read(config_path)
       # trim off anything after __END__
       config.sub!(/^__END__\n.*/, '')
-      @app.module_eval(config_path)
+      @app.module_eval(config)
     end
 
     def self.logger=(logger)
