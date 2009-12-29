@@ -29,6 +29,10 @@ module Vegas
       @rack_handler = @app.respond_to?(:detect_rack_handler) ? 
         @app.send(:detect_rack_handler) : Rack::Handler.get('thin')
       # load options from opt parser
+      if before_run = options.delete(:before_run) and before_run.is_a?(Proc)
+        before_run.call(self)
+      end
+      
       @args = define_options do |opts|
         if block_given?
           opts.separator ''
@@ -40,6 +44,7 @@ module Vegas
       # set app options
       @host = options[:host] || HOST
       @app.set(options) if @app.respond_to?(:set)
+      @app.set(:vegas, self)
       # initialize app dir
       FileUtils.mkdir_p(app_dir)
       return if options[:start] === false
@@ -181,6 +186,20 @@ module Vegas
       else
         logger.info "#{app_name} not running!"
       end
+    end
+    
+    # Loads a config file at config_path and evals it in the context
+    # of the @app. Also if the first line is a comment will parse it as 
+    # options
+    def load_config_file(config_path)
+      abort "Can not find config file at #{config_path}" if !File.readable?(config_path)
+      config = File.read(config_path)
+      if config[/^#\\(.*)/]
+        @runtime_args.shift $1.split(/\s+/)
+      end
+      # trim off anything after __END__
+      config.sub!(/^__END__\n.*/, '')
+      @app.module_eval(config_path)
     end
 
     def self.logger=(logger)
