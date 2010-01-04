@@ -13,9 +13,12 @@ begin
     s.email = ["aaron@quirkey.com"]
     s.homepage = %q{http://code.quirkey.com/vegas}
     s.rubyforge_project = %q{quirkey}
+    
     s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
-    s.add_development_dependency(%q<bacon>, [">= 1.1.0"])
-    s.add_development_dependency(%q<sinatra>, [">= 0.9.4"])
+    
+    s.add_development_dependency(%q<mocha>,   ["~> 0.9.8"])
+    s.add_development_dependency(%q<bacon>,   ["~> 1.1.0"])
+    s.add_development_dependency(%q<sinatra>, ["~> 0.9.4"])
     
   end
   Jeweler::GemcutterTasks.new
@@ -30,3 +33,5 @@ Rake::TestTask.new do |t|
 end
 
 Dir['tasks/**/*.rake'].each { |t| load t }
+
+task :default => :test
