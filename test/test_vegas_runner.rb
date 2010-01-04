@@ -1,6 +1,8 @@
 require File.join(File.dirname(__FILE__), 'test_helper.rb')
 
-Vegas::Runner::ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
+unless defined? Vegas::Runner::ROOT_DIR
+  Vegas::Runner::ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
+end
 
 describe 'Vegas::Runner' do
   before do
@@ -9,7 +11,7 @@ describe 'Vegas::Runner' do
     Vegas::Runner.logger = Logger.new(@log)
   end
 
-  describe '.new' do
+  describe 'creating an instance' do
 
     describe 'with basic usage' do
       before do
