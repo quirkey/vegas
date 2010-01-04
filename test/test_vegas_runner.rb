@@ -46,6 +46,14 @@ describe 'Vegas::Runner' do
       it "writes a url with the port" do
         @vegas.url_file.should have_matching_file_content(/0.0.0.0\:#{@vegas.port}/)
       end
+      
+      it "knows where to find the pid file" do
+        @vegas.pid_file.should.equal File.join(@vegas.app_dir, @vegas.app_name + ".pid")
+      end
+      
+      # it "writes a pid file" do
+      #   @vegas.pid_file.should exist_as_file
+      # end
     end
 
     describe 'with a sinatra app' do
