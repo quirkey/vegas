@@ -98,7 +98,7 @@ module Vegas
         find_port
         write_url
         launch!(url, path)
-        daemonize! unless options[:foreground]      
+        daemonize! unless options[:foreground]
         run!
       rescue RuntimeError => e
         logger.warn "There was an error starting #{app_name}: #{e}"
@@ -108,19 +108,24 @@ module Vegas
 
     def find_port
       if @port = options[:port]
-        logger.info "Trying to start '#{app_name}' on Port #{port}"
-        if !port_open?
+        announce_port_attempted
+        
+        unless port_open?
           logger.warn "Port #{port} is already in use. Please try another or don't use -P, for auto-port"
         end
       else
         @port = PORT
-        logger.info "Trying to start '#{app_name}' on Port #{port}"
+        announce_port_attempted
         
         until port_open?
           @port += 1
-          logger.info "Trying to start '#{app_name}' on Port #{port}"
+          announce_port_attempted
         end
       end
+    end
+    
+    def announce_port_attempted
+      logger.info "Trying to start '#{app_name}' on Port #{port}"
     end
 
     def port_open?(check_url = nil)
