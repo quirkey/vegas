@@ -153,6 +153,7 @@ module Vegas
     end
 
     def run!
+      logger.info "Running with Rack handler: #{@rack_handler.inspect}"
       rack_handler.run app, :Host => host, :Port => port do |server|
         trap(kill_command) do
           ## Use thins' hard #stop! if available, otherwise just #stop
