@@ -1,6 +1,9 @@
 require File.join(File.dirname(__FILE__), 'test_helper.rb')
 
-Vegas::Runner::ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
+Vegas::Runner.class_eval do
+  remove_const :ROOT_DIR
+  ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
+end
 
 describe 'Vegas::Runner' do
   before do
@@ -46,22 +49,30 @@ describe 'Vegas::Runner' do
       end
     end
 
-    describe 'with a sinatra app' do
+    describe 'with a sinatra app using mongrel for the server' do
       before do
-        TestApp1.expects(:detect_rack_handler).returns(Rack::Handler::Mongrel)
+        TestApp1.set :server, "mongrel"
         Vegas::Runner.any_instance.expects(:system).once
         Rack::Handler::Mongrel.stubs(:run)
         vegas(TestApp1, 'vegas_test_app_1', {:skip_launch => true, :sessions => true}, ["route","--debug"])
       end
-    
+      
       it 'sets the rack handler automaticaly' do
         @vegas.rack_handler.should == Rack::Handler::Mongrel
       end
+    end
     
-      it "sets options on the app" do
-        @vegas.app.sessions.should.be.true
+    describe 'with a sinatra app using webrick for the server' do
+      before do
+        TestApp1.set :server, "webrick"
+        Vegas::Runner.any_instance.expects(:system).once
+        Rack::Handler::WEBrick.stubs(:run)
+        vegas(TestApp1, 'vegas_test_app_1', {:skip_launch => true, :sessions => true}, ["route","--debug"])
       end
-
+      
+      it 'sets the rack handler automaticaly' do
+        @vegas.rack_handler.should == Rack::Handler::WEBrick
+      end
     end
 
     describe 'with a simple rack app' do

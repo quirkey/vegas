@@ -48,4 +48,8 @@ module TestHelper
 
 end
 
-Bacon::Context.send(:include, TestHelper)
+module Bacon
+  summary_on_exit
+  # extend TestUnitOutput
+  class Context; include TestHelper; end
+end
