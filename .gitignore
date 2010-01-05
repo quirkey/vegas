@@ -1,1 +1,5 @@
-.DS_Storetest/tmppkg*_layouts*.sw?
+.DS_Store
+test/tmp
+pkg/*
+_layouts
+*.sw?
