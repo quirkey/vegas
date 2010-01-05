@@ -14,7 +14,7 @@ describe 'Vegas::Runner' do
 
   describe 'creating an instance' do
 
-    describe 'with basic usage' do
+    describe 'basic usage' do
       before do
         Vegas::Runner.any_instance.expects(:system).once
         vegas(TestApp1, 'vegas_test_app_1', {:sessions => true}, ["route","--debug"])
@@ -26,6 +26,55 @@ describe 'Vegas::Runner' do
 
       it "sets app name" do
         @vegas.app_name.should == 'vegas_test_app_1'
+      end
+      
+      it "sets filesystem friendly app name" do
+        @vegas.filesystem_friendly_app_name.should == 'vegas_test_app_1'
+      end
+
+      it "stores options" do
+        @vegas.options[:sessions].should.be.true
+      end
+
+      it "puts unparsed args into args" do
+        @vegas.args.should == ["route"]
+      end
+
+      it "parses options into @options" do
+        @vegas.options[:debug].should.be.true
+      end
+
+      it "writes the app dir" do
+        @vegas.app_dir.should exist_as_file
+      end
+
+      it "writes a url with the port" do
+        @vegas.url_file.should have_matching_file_content(/0.0.0.0\:#{@vegas.port}/)
+      end
+      
+      it "knows where to find the pid file" do
+        @vegas.pid_file.should.equal \
+          File.join(@vegas.app_dir, @vegas.filesystem_friendly_app_name + ".pid")
+        # @vegas.pid_file.should exist_as_file
+      end
+    end
+    
+    describe 'basic usage with a funky app name' do
+      before do
+        Vegas::Runner.any_instance.expects(:system).once
+        vegas(TestApp1, 'Funky YEAH!1!', {:sessions => true}, ["route","--debug"])
+      end
+
+      it "sets app" do
+        @vegas.app.should == TestApp1
+      end
+
+      it "sets app name" do
+        @vegas.app_name.should == 'Funky YEAH!1!'
+      end
+      
+      it "sets filesystem friendly app name" do
+        @vegas.filesystem_friendly_app_name.should == 'Funky_YEAH_1_'
       end
 
       it "stores options" do
