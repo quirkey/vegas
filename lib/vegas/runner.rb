@@ -15,23 +15,23 @@ module Vegas
   class Runner
     attr_reader :app, :app_name, :filesystem_friendly_app_name, 
       :rack_handler, :port, :host, :options, :args
-
+    
     ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
     PORT       = 5678
     HOST       = WINDOWS ? 'localhost' : '0.0.0.0'
-
+    
     def initialize(app, app_name, set_options = {}, runtime_args = ARGV, &block)
-      @app          = app
-      @app_name     = app_name
-      @options      = set_options || {}
-      @runtime_args = runtime_args
-      
-      @filesystem_friendly_app_name = @app_name.gsub(/\W+/, "_")
+      @options = set_options || {}
       
       self.class.logger.level = options[:debug] ? Logger::DEBUG : Logger::INFO
       
-      @rack_handler = @app.respond_to?(:detect_rack_handler) ? 
-        @app.send(:detect_rack_handler) : Rack::Handler.get('thin')
+      @app          = app
+      @app_name     = app_name
+      
+      @filesystem_friendly_app_name = @app_name.gsub(/\W+/, "_")
+      
+      @runtime_args = runtime_args
+      @rack_handler = setup_rack_handler
       
       # load options from opt parser      
       @args = define_options do |opts|
@@ -210,11 +210,11 @@ module Vegas
       config.sub!(/^__END__\n.*/, '')
       @app.module_eval(config)
     end
-
+    
     def self.logger=(logger)
       @logger = logger
     end
-
+    
     def self.logger
       @logger ||= LOGGER if defined?(LOGGER)
       if !@logger
@@ -228,8 +228,40 @@ module Vegas
     def logger
       self.class.logger
     end
-
-    private
+    
+  private
+    def setup_rack_handler
+      # First try to set Rack handler via a special hook we honor
+      @rack_handler = if @app.respond_to?(:detect_rack_handler)
+        @app.detect_rack_handler
+      
+      # If they aren't using our hook, try to use their @app.server settings
+      elsif @app.respond_to?(:server) and @app.server
+        # If :server isn't set, it returns an array of possibilities, 
+        # sorted from most to least preferable.
+        if @app.server.is_a?(Array)
+          handler = nil
+          @app.server.each do |server|
+            begin
+              handler = Rack::Handler.get(server)
+              break
+            rescue NameError => e
+              next
+            end
+          end
+          handler
+        
+        # :server might be set explicitly to a single option like "mongrel"
+        else
+          Rack::Handler.get(@app.server)
+        end
+      
+      # If all else fails, we'll use Thin
+      else
+        Rack::Handler::Thin
+      end
+    end
+    
     def define_options
       OptionParser.new("", 24, '  ') do |opts|
         opts.banner = "Usage: #{app_name} [options]"

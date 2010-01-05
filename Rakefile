@@ -32,6 +32,4 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
-Dir['tasks/**/*.rake'].each { |t| load t }
-
 task :default => :test
