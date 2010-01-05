@@ -6,26 +6,30 @@ if Vegas::WINDOWS
   begin
     require 'win32/process'
   rescue 
-    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:\n gem install win32-process"
+    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:\n " +
+         "gem install win32-process"
   end
 end
 
 module Vegas
   class Runner
-    attr_reader :app, :app_name, :rack_handler, :port, :host, :options, :args
+    attr_reader :app, :app_name, :filesystem_friendly_app_name, 
+      :rack_handler, :port, :host, :options, :args
 
     ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
     PORT       = 5678
     HOST       = WINDOWS ? 'localhost' : '0.0.0.0'
 
     def initialize(app, app_name, set_options = {}, runtime_args = ARGV, &block)
-      # initialize
-      @app                    = app
-      @app_name               = app_name
-      @options                = set_options || {}
-      @runtime_args           = runtime_args
+      @app          = app
+      @app_name     = app_name
+      @options      = set_options || {}
+      @runtime_args = runtime_args
+      
+      @filesystem_friendly_app_name = @app_name.gsub(/\W+/, "_")
+      
       self.class.logger.level = options[:debug] ? Logger::DEBUG : Logger::INFO
-            
+      
       @rack_handler = @app.respond_to?(:detect_rack_handler) ? 
         @app.send(:detect_rack_handler) : Rack::Handler.get('thin')
       
@@ -38,40 +42,44 @@ module Vegas
         end
       end
       
-      # Call before run if before_run is a Proc
-      if before_run = options.delete(:before_run) and 
-          before_run.is_a?(Proc)
+      # Handle :before_run hook
+      if (before_run = options.delete(:before_run)).respond_to?(:call)
         before_run.call(self)
       end
 
-      # set app options
+      # Set app options
       @host = options[:host] || HOST
-      if @app.respond_to?(:set)
-        @app.set(options) 
-        @app.set(:vegas, self)
+      
+      if app.respond_to?(:set)
+        app.set(options) 
+        app.set(:vegas, self)
       end
-      # initialize app dir
+      
+      # Make sure app dir is setup
       FileUtils.mkdir_p(app_dir)
-      return if options[:start] === false
+      
+      return if options[:start] == false
+      
       # evaluate the launch_path
-      path = if options[:launch_path] && options[:launch_path].respond_to?(:call)
+      path = if options[:launch_path].respond_to?(:call)
         options[:launch_path].call(self)
       else
         options[:launch_path]
       end
+      
       start(path)
     end
 
     def app_dir
-      File.join(ROOT_DIR, app_name)
+      File.join(ROOT_DIR, filesystem_friendly_app_name)
     end
 
     def pid_file
-      File.join(app_dir, "#{app_name}.pid")
+      File.join(app_dir, "#{filesystem_friendly_app_name}.pid")
     end
 
     def url_file
-      File.join(app_dir, "#{app_name}.url")
+      File.join(app_dir, "#{filesystem_friendly_app_name}.url")
     end
 
     def url
@@ -79,7 +87,7 @@ module Vegas
     end
 
     def log_file
-      File.join(app_dir, "#{app_name}.log")
+      File.join(app_dir, "#{filesystem_friendly_app_name}.log")
     end
 
     def start(path = nil)
@@ -105,10 +113,11 @@ module Vegas
         end
       else
         @port = PORT
-        logger.info "Trying to start #{app_name} on Port #{port}"
-        while !port_open?
+        logger.info "Trying to start '#{app_name}' on Port #{port}"
+        
+        until port_open?
           @port += 1
-          logger.info "Trying to start #{app_name} on Port #{port}"
+          logger.info "Trying to start '#{app_name}' on Port #{port}"
         end
       end
     end

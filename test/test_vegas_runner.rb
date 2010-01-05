@@ -48,12 +48,35 @@ describe 'Vegas::Runner' do
       end
       
       it "knows where to find the pid file" do
-        @vegas.pid_file.should.equal File.join(@vegas.app_dir, @vegas.app_name + ".pid")
+        @vegas.pid_file.should.equal \
+          File.join(@vegas.app_dir, @vegas.filesystem_friendly_app_name + ".pid")
+        # @vegas.pid_file.should exist_as_file
+      end
+    end
+    
+    describe 'with a funky app name' do
+      before do
+        Vegas::Runner.any_instance.expects(:system).once
+        vegas(TestApp1, 'Funky App Time YEAH!!1', {:sessions => true}, ["route","--debug"])
       end
       
-      # it "writes a pid file" do
-      #   @vegas.pid_file.should exist_as_file
-      # end
+      it "sets app name" do
+        @vegas.app_name.should == 'Funky App Time YEAH!!1'
+      end
+      
+      it "writes the app dir" do
+        @vegas.app_dir.should exist_as_file
+      end
+
+      it "writes a url with the port" do
+        @vegas.url_file.should have_matching_file_content(/0.0.0.0\:#{@vegas.port}/)
+      end
+      
+      it "knows where to find the pid file" do
+        @vegas.pid_file.should.equal \
+          File.join(@vegas.app_dir, @vegas.filesystem_friendly_app_name + ".pid")
+        # @vegas.pid_file.should exist_as_file
+      end
     end
 
     describe 'with a sinatra app' do
