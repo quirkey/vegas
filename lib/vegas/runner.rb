@@ -108,6 +108,7 @@ module Vegas
 
     def find_port
       if @port = options[:port]
+        logger.info "Trying to start '#{app_name}' on Port #{port}"
         if !port_open?
           logger.warn "Port #{port} is already in use. Please try another or don't use -P, for auto-port"
         end
