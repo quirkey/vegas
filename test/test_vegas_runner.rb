@@ -28,6 +28,10 @@ describe 'Vegas::Runner' do
         @vegas.app_name.should == 'vegas_test_app_1'
       end
       
+      it "sets quoted app name" do
+        @vegas.quoted_app_name.should == "'vegas_test_app_1'"
+      end
+      
       it "sets filesystem friendly app name" do
         @vegas.filesystem_friendly_app_name.should == 'vegas_test_app_1'
       end
@@ -71,6 +75,10 @@ describe 'Vegas::Runner' do
 
       it "sets app name" do
         @vegas.app_name.should == 'Funky YEAH!1!'
+      end
+      
+      it "sets quoted app name" do
+        @vegas.quoted_app_name.should == "'Funky YEAH!1!'"
       end
       
       it "sets filesystem friendly app name" do

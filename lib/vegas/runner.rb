@@ -13,7 +13,7 @@ end
 
 module Vegas
   class Runner
-    attr_reader :app, :app_name, :filesystem_friendly_app_name, 
+    attr_reader :app, :app_name, :filesystem_friendly_app_name, :quoted_app_name,
       :rack_handler, :port, :host, :options, :args
     
     ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
@@ -29,6 +29,7 @@ module Vegas
       @app_name     = app_name
       
       @filesystem_friendly_app_name = @app_name.gsub(/\W+/, "_")
+      @quoted_app_name = "'#{app_name}'"
       
       @runtime_args = runtime_args
       @rack_handler = setup_rack_handler
@@ -37,7 +38,7 @@ module Vegas
       @args = define_options do |opts|
         if block_given?
           opts.separator ''
-          opts.separator "#{app_name} options:"
+          opts.separator "#{quoted_app_name} options:"
           yield(self, opts, app)
         end
       end
@@ -92,7 +93,7 @@ module Vegas
 
     def start(path = nil)
       logger.info "Running with Windows Settings" if WINDOWS
-      logger.info "Starting #{app_name}"
+      logger.info "Starting #{quoted_app_name}"
       begin
         check_for_running(path)
         find_port
@@ -101,7 +102,7 @@ module Vegas
         daemonize! unless options[:foreground]
         run!
       rescue RuntimeError => e
-        logger.warn "There was an error starting #{app_name}: #{e}"
+        logger.warn "There was an error starting #{quoted_app_name}: #{e}"
         exit
       end
     end
@@ -125,7 +126,7 @@ module Vegas
     end
     
     def announce_port_attempted
-      logger.info "Trying to start '#{app_name}' on Port #{port}"
+      logger.info "Trying to start #{quoted_app_name} on port #{port}"
     end
 
     def port_open?(check_url = nil)
@@ -145,7 +146,7 @@ module Vegas
       if File.exists?(pid_file) && File.exists?(url_file)
         running_url = File.read(url_file)
         if !port_open?(running_url)
-          logger.warn "#{app_name} is already running at #{running_url}"
+          logger.warn "#{quoted_app_name} is already running at #{running_url}"
           launch!(running_url, path)
           exit!
         end
@@ -154,11 +155,12 @@ module Vegas
 
     def run!
       logger.info "Running with Rack handler: #{@rack_handler.inspect}"
+      
       rack_handler.run app, :Host => host, :Port => port do |server|
         trap(kill_command) do
           ## Use thins' hard #stop! if available, otherwise just #stop
           server.respond_to?(:stop!) ? server.stop! : server.stop
-          logger.info "#{app_name} received INT ... stopping"
+          logger.info "#{quoted_app_name} received INT ... stopping"
           delete_pid!
         end
       end
@@ -201,11 +203,11 @@ module Vegas
 
     def status
       if File.exists?(pid_file)
-        logger.info "#{app_name} running"
+        logger.info "#{quoted_app_name} running"
         logger.info "PID #{File.read(pid_file)}"
         logger.info "URL #{File.read(url_file)}" if File.exists?(url_file)
       else
-        logger.info "#{app_name} not running!"
+        logger.info "#{quoted_app_name} not running!"
       end
     end
     
@@ -271,6 +273,8 @@ module Vegas
     
     def define_options
       OptionParser.new("", 24, '  ') do |opts|
+        # TODO instead of app_name, we should determine the name of the script 
+        # used to invoke Vegas and use that here
         opts.banner = "Usage: #{app_name} [options]"
 
         opts.separator ""
@@ -326,7 +330,7 @@ module Vegas
 
         opts.on_tail("--version", "Show version") do
           if app.respond_to?(:version)
-            puts "#{app_name} #{app.version}"
+            puts "#{quoted_app_name} #{app.version}"
           end
           puts "rack #{Rack::VERSION.join('.')}"
           puts "sinatra #{Sinatra::VERSION}" if defined?(Sinatra)
