@@ -6,7 +6,7 @@ if Vegas::WINDOWS
   begin
     require 'win32/process'
   rescue 
-    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:\n " +
+    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:",
          "gem install win32-process"
   end
 end
@@ -25,8 +25,8 @@ module Vegas
       
       self.class.logger.level = options[:debug] ? Logger::DEBUG : Logger::INFO
       
-      @app          = app
-      @app_name     = app_name
+      @app      = app
+      @app_name = app_name
       
       @filesystem_friendly_app_name = @app_name.gsub(/\W+/, "_")
       @quoted_app_name = "'#{app_name}'"
