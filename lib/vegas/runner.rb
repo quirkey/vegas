@@ -172,7 +172,6 @@ module Vegas
         logger.debug "Parent Process: #{Process.pid}"
         exit! if fork
         logger.debug "Child Process: #{Process.pid}"
-        Dir.chdir "/"
         File.umask 0000
         FileUtils.touch(log_file)
         STDIN.reopen  log_file
@@ -275,7 +274,7 @@ module Vegas
       OptionParser.new("", 24, '  ') do |opts|
         # TODO instead of app_name, we should determine the name of the script 
         # used to invoke Vegas and use that here
-        opts.banner = "Usage: your_executable_name [options]"
+        opts.banner = "Usage: #{$0 || app_name} [options]"
 
         opts.separator ""
         opts.separator "Vegas options:"
