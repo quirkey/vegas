@@ -93,7 +93,7 @@ module Vegas
 
     def start(path = nil)
       logger.info "Running with Windows Settings" if WINDOWS
-      logger.info "Starting #{quoted_app_name}"
+      logger.info "Starting #{quoted_app_name}..."
       begin
         check_for_running(path)
         find_port
@@ -112,7 +112,8 @@ module Vegas
         announce_port_attempted
         
         unless port_open?
-          logger.warn "Port #{port} is already in use. Please try another or don't use -P, for auto-port"
+          logger.warn "Port #{port} is already in use. Please try another. " +
+                      "You can also omit the port flag, and we'll find one for you."
         end
       else
         @port = PORT
@@ -126,7 +127,7 @@ module Vegas
     end
     
     def announce_port_attempted
-      logger.info "Trying to start #{quoted_app_name} on port #{port}"
+      logger.info "trying port #{port}..."
     end
 
     def port_open?(check_url = nil)
