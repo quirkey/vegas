@@ -112,20 +112,7 @@ describe 'Vegas::Runner' do
       end
     end
     
-    describe 'with a sinatra app using mongrel for the server' do
-      before do
-        TestApp1.set :server, "mongrel"
-        Vegas::Runner.any_instance.expects(:system).once
-        Rack::Handler::Mongrel.stubs(:run)
-        vegas(TestApp1, 'vegas_test_app_1', {:skip_launch => true, :sessions => true}, ["route","--debug"])
-      end
-      
-      it 'sets the rack handler automaticaly' do
-        @vegas.rack_handler.should == Rack::Handler::Mongrel
-      end
-    end
-    
-    describe 'with a sinatra app using webrick for the server' do
+    describe 'with a sinatra app using an explicit server setting' do
       before do
         TestApp1.set :server, "webrick"
         Vegas::Runner.any_instance.expects(:system).once
