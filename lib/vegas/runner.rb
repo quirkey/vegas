@@ -174,14 +174,16 @@ module Vegas
         exit! if fork
         logger.debug "Child Process: #{Process.pid}"
         Dir.chdir "/"
-        File.umask 0000
-        FileUtils.touch(log_file)
-        STDIN.reopen  log_file
-        STDOUT.reopen log_file, "a"
-        STDERR.reopen log_file, "a"
       else
-        Process.daemon
+        Process.daemon("/", true)
       end
+      
+      File.umask 0000
+      FileUtils.touch log_file
+      STDIN.reopen    log_file
+      STDOUT.reopen   log_file, "a"
+      STDERR.reopen   log_file, "a"
+      
       logger.debug "Child Process: #{Process.pid}"
 
       File.open(pid_file, 'w') {|f| f.write("#{Process.pid}") }
