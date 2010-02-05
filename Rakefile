@@ -7,7 +7,7 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end
 
-version = if ENV["DEV"]
+VEGAS_VERSION = if ENV["DEV"]
   "#{Vegas::VERSION}.#{Time.new.to_i}"
 else
   Vegas::VERSION
@@ -15,7 +15,7 @@ end
 
 Jeweler::Tasks.new do |s|
   s.name = %q{vegas}
-  s.version = version
+  s.version = VEGAS_VERSION
   s.authors = ["Aaron Quint"]
   s.date = %q{2009-08-30}
   s.summary              = "Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps."
@@ -41,3 +41,7 @@ end
 
 task :package => :build
 task :default => :test
+
+task "install:dev" => :build do
+  system "gem install pkg/vegas-#{VEGAS_VERSION}.gem"
+end
