@@ -6,7 +6,7 @@ if Vegas::WINDOWS
   begin
     require 'win32/process'
   rescue 
-    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:\n " +
+    puts "Sorry, in order to use Vegas on Windows you need the win32-process gem:",
          "gem install win32-process"
   end
 end
@@ -25,8 +25,8 @@ module Vegas
       
       self.class.logger.level = options[:debug] ? Logger::DEBUG : Logger::INFO
       
-      @app          = app
-      @app_name     = app_name
+      @app      = app
+      @app_name = app_name
       
       @filesystem_friendly_app_name = @app_name.gsub(/\W+/, "_")
       @quoted_app_name = "'#{app_name}'"
@@ -93,7 +93,7 @@ module Vegas
 
     def start(path = nil)
       logger.info "Running with Windows Settings" if WINDOWS
-      logger.info "Starting #{quoted_app_name}"
+      logger.info "Starting #{quoted_app_name}..."
       begin
         check_for_running(path)
         find_port
@@ -112,7 +112,8 @@ module Vegas
         announce_port_attempted
         
         unless port_open?
-          logger.warn "Port #{port} is already in use. Please try another or don't use -P, for auto-port"
+          logger.warn "Port #{port} is already in use. Please try another. " +
+                      "You can also omit the port flag, and we'll find one for you."
         end
       else
         @port = PORT
@@ -126,7 +127,7 @@ module Vegas
     end
     
     def announce_port_attempted
-      logger.info "Trying to start #{quoted_app_name} on port #{port}"
+      logger.info "trying port #{port}..."
     end
 
     def port_open?(check_url = nil)
@@ -172,14 +173,17 @@ module Vegas
         logger.debug "Parent Process: #{Process.pid}"
         exit! if fork
         logger.debug "Child Process: #{Process.pid}"
-        File.umask 0000
-        FileUtils.touch(log_file)
-        STDIN.reopen  log_file
-        STDOUT.reopen log_file, "a"
-        STDERR.reopen log_file, "a"
+        Dir.chdir "/"
       else
-        Process.daemon
+        Process.daemon("/", true)
       end
+      
+      File.umask 0000
+      FileUtils.touch log_file
+      STDIN.reopen    log_file
+      STDOUT.reopen   log_file, "a"
+      STDERR.reopen   log_file, "a"
+      
       logger.debug "Child Process: #{Process.pid}"
 
       File.open(pid_file, 'w') {|f| f.write("#{Process.pid}") }
