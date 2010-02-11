@@ -173,9 +173,8 @@ module Vegas
         logger.debug "Parent Process: #{Process.pid}"
         exit! if fork
         logger.debug "Child Process: #{Process.pid}"
-        Dir.chdir "/"
       else
-        Process.daemon("/", true)
+        Process.daemon(true, true)
       end
       
       File.umask 0000
