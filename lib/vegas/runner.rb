@@ -72,23 +72,23 @@ module Vegas
     end
 
     def app_dir
-      File.join(ROOT_DIR, filesystem_friendly_app_name)
+      options[:app_dir] || File.join(ROOT_DIR, filesystem_friendly_app_name)
     end
 
     def pid_file
-      File.join(app_dir, "#{filesystem_friendly_app_name}.pid")
+      options[:pid_file] || File.join(app_dir, "#{filesystem_friendly_app_name}.pid")
     end
 
     def url_file
-      File.join(app_dir, "#{filesystem_friendly_app_name}.url")
-    end
-
-    def url
-      "http://#{host}:#{port}"
+      options[:url_file] || File.join(app_dir, "#{filesystem_friendly_app_name}.url")
     end
 
     def log_file
-      File.join(app_dir, "#{filesystem_friendly_app_name}.log")
+      options[:log_file] || File.join(app_dir, "#{filesystem_friendly_app_name}.log")
+    end
+    
+    def url
+      "http://#{host}:#{port}"
     end
 
     def start(path = nil)
@@ -282,6 +282,16 @@ module Vegas
         opts.separator ""
         opts.separator "Vegas options:"
 
+        opts.on('-K', "--kill", "kill the running process and exit") {|k| 
+          kill!
+          exit
+        }
+
+        opts.on('-S', "--status", "display the current running PID and URL then quit") {|s| 
+          status
+          exit!
+        }
+
         opts.on("-s", "--server SERVER", "serve using SERVER (thin/mongrel/webrick)") { |s|
           @rack_handler = Rack::Handler.get(s)
         }
@@ -305,21 +315,27 @@ module Vegas
         opts.on("-L", "--no-launch", "don't launch the browser") { |f|
           @options[:skip_launch] = true
         }
-
-        opts.on('-K', "--kill", "kill the running process and exit") {|k| 
-          kill!
-          exit
-        }
-
-        opts.on('-S', "--status", "display the current running PID and URL then quit") {|s| 
-          status
-          exit!
-        }
-
+        
         opts.on('-d', "--debug", "raise the log level to :debug (default: :info)") {|s| 
           @options[:debug] = true
         }
-
+                
+        opts.on("--app-dir APP_DIR", "set the app dir where files are stored (default: ~/.vegas/#{filesystem_friendly_app_name})/)") {|app_dir| 
+          @options[:app_dir] = app_dir
+        }
+        
+        opts.on("-P", "--pid-file PID_FILE", "set the path to the pid file (default: app_dir/#{filesystem_friendly_app_name}.pid)") {|pid_file| 
+          @options[:pid_file] = pid_file
+        }
+        
+        opts.on("--log-file LOG_FILE", "set the path to the log file (default: app_dir/#{filesystem_friendly_app_name}.log)") {|log_file| 
+          @options[:log_file] = log_file
+        }                
+        
+        opts.on("--url-file URL_FILE", "set the path to the URL file (default: app_dir/#{filesystem_friendly_app_name}.url)") {|url_file| 
+          @options[:url_file] = url_file
+        }                
+        
         yield opts if block_given?
 
         opts.separator ""
