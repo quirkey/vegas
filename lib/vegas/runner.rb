@@ -256,7 +256,7 @@ module Vegas
             begin
               handler = Rack::Handler.get(server)
               break
-            rescue NameError => e
+            rescue LoadError, NameError => e
               next
             end
           end
