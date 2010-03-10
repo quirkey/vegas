@@ -1,3 +1,7 @@
+== 0.1.5 2010-03-09
+
+* Fixed: Gracefully catch error when thin isnt available (nevans)
+
 == 0.1.4 2010-02-09
 
 * Fixed: Logging on Ruby 1.9 (greatseth)

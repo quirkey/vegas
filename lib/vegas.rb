@@ -8,7 +8,7 @@ end
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
 module Vegas
-  VERSION = "0.1.4"
+  VERSION = "0.1.5"
   WINDOWS = !!(RUBY_PLATFORM =~ /(mingw|bccwin|wince|mswin32)/i)
   
   autoload :Runner, 'vegas/runner'
