@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{vegas}
-  s.version = "0.1.4"
+  s.version = "0.1.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Quint"]
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{quirkey}
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps.}
   s.test_files = [
     "test/apps.rb",
