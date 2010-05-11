@@ -150,7 +150,7 @@ module Vegas
         if !port_open?(running_url)
           logger.warn "#{quoted_app_name} is already running at #{running_url}"
           launch!(running_url, path)
-          exit!
+          exit!(1)
         end
       end
     end
@@ -172,7 +172,7 @@ module Vegas
     def daemonize!
       if RUBY_VERSION < "1.9"
         logger.debug "Parent Process: #{Process.pid}"
-        exit! if fork
+        exit!(0) if fork
         logger.debug "Child Process: #{Process.pid}"
       else
         Process.daemon(true, true)
@@ -290,7 +290,7 @@ module Vegas
 
         opts.on('-S', "--status", "display the current running PID and URL then quit") {|s| 
           status
-          exit!
+          exit!(0)
         }
 
         opts.on("-s", "--server SERVER", "serve using SERVER (thin/mongrel/webrick)") { |s|
