@@ -43,6 +43,11 @@ module Vegas
           yield(self, opts, app)
         end
       end
+
+      if @should_kill
+        kill!
+        exit!(0)
+      end
       
       # Handle :before_run hook
       if (before_run = options.delete(:before_run)).respond_to?(:call)
@@ -284,8 +289,7 @@ module Vegas
         opts.separator "Vegas options:"
 
         opts.on('-K', "--kill", "kill the running process and exit") {|k| 
-          kill!
-          exit
+          @should_kill = true
         }
 
         opts.on('-S', "--status", "display the current running PID and URL then quit") {|s| 
