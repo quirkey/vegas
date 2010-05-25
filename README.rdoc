@@ -26,7 +26,9 @@ See the website: http://code.quirkey.com/vegas for full usage/options.
 === WINDOWS:
 
 Using vegas (and gems that depend on it) on Windows works but isn't 100% the same. 
-Daemon-ization and browser launching work, but you will see duplicate messages.
+Daemon-ization and browser launching work, but you will see duplicate messages. 
+Some options might also be lost in the process. I suggest running Vegas apps
+in windows with the -F (foreground) flag.
 
 If you see a warning like:
 
