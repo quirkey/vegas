@@ -35,9 +35,9 @@ Lets say you have a Sinatra app that looks like:
 {% highlight ruby %}
 # /my_app.rb
 require 'rubygems'
-require 'sinatra'
+require 'sinatra/base'
 
-class MyApp < Sinatra::Default
+class MyApp < Sinatra::Base
   
   get '/' do
     "This is my app"
