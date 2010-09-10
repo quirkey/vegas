@@ -142,6 +142,9 @@ module Vegas
         false
       rescue Errno::ECONNREFUSED => e
         true
+      rescue Errno::EPERM => e
+        # catches the "Operation not permitted" under Cygwin
+        true
       end
     end
 
