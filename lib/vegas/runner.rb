@@ -138,7 +138,8 @@ module Vegas
 
     def port_open?(check_url = nil)
       begin
-        open(check_url || url)
+        check_url ||= url
+        options[:no_proxy] ? open(check_url, :proxy => nil) : open(check_url) 
         false
       rescue Errno::ECONNREFUSED => e
         true
