@@ -313,6 +313,10 @@ module Vegas
           @options[:port] = port
         }
 
+        opts.on("-x", "--no-proxy", "ingnore env proxy settings (e.g. http_proxy)") { |p|
+          @options[:no_proxy] = true
+        }
+
         opts.on("-e", "--env ENVIRONMENT", "use ENVIRONMENT for defaults (default: development)") { |e|
           @options[:environment] = e
         }
