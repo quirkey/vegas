@@ -2,7 +2,7 @@
 layout: quirkey_code
 title: vegas
 github_name: vegas
-current_version: 0.1.4
+current_version: 0.1.8
 nav:
   - name: What
     link: "#what"
