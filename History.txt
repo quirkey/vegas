@@ -1,3 +1,8 @@
+== 0.1.8
+
+* Add --no-proxy option for dealing with https and services behind proxies (	plukevdh)
+* Update test suite for 1.9.2
+
 == 0.1.7
 
 * Exit with specific exit status (for monitoring/good unix citizen).
