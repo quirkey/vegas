@@ -17,7 +17,7 @@ module Vegas
     attr_reader :app, :app_name, :filesystem_friendly_app_name, :quoted_app_name,
       :rack_handler, :port, :host, :options, :args
 
-    ROOT_DIR   = File.expand_path(File.join('~', '.vegas'))
+    ROOT_DIR = ENV['HOME'] ? File.expand_path(File.join('~', '.vegas')) : nil
     PORT       = 5678
     HOST       = WINDOWS ? 'localhost' : '0.0.0.0'
 
@@ -78,6 +78,9 @@ module Vegas
     end
 
     def app_dir
+      if !options[:app_dir] && !ROOT_DIR
+        raise ArgumentError.new("nor --app-dir neither EVN['HOME'] defined")
+      end
       options[:app_dir] || File.join(ROOT_DIR, filesystem_friendly_app_name)
     end
 
