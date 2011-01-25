@@ -2,7 +2,7 @@ require File.join('.', File.dirname(__FILE__), 'test_helper.rb')
 
 Vegas::Runner.class_eval do
   remove_const :ROOT_DIR
-  ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
+  Vegas::Runner::ROOT_DIR = File.join(File.dirname(__FILE__), 'tmp', '.vegas')
 end
 
 describe 'Vegas::Runner' do
@@ -157,6 +157,30 @@ describe 'Vegas::Runner' do
       end
     end
 
+    describe 'without environment' do
+
+      Vegas::Runner::ROOT_DIR = nil
+
+      before do
+        @app_dir = './test/tmp'
+      end
+
+      it 'should be ok with --app-dir' do
+        vegas(RackApp1, 'rack_app_1', {:skip_launch => true, :app_dir => @app_dir})
+        @vegas.app_dir.should == @app_dir
+      end
+
+      it 'should raise an exception without --app-dir' do
+        success = false
+        begin
+          vegas(RackApp1, 'rack_app_1', {:skip_launch => true})
+        rescue ArgumentError
+          success = true
+        end
+        success.should == true
+      end
+
+    end
 
   end
 
