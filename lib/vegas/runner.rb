@@ -179,14 +179,24 @@ module Vegas
 
     # Adapted from Rackup
     def daemonize!
-      if RUBY_VERSION < "1.9"
+      if Vegas.jruby?
+        # It's not a true daemon but when executed with & works like one
+        thread = Thread.new {daemon_execute}
+        thread.join
+        
+      elsif RUBY_VERSION < "1.9"
         logger.debug "Parent Process: #{Process.pid}"
         exit!(0) if fork
         logger.debug "Child Process: #{Process.pid}"
+        daemon_execute
+        
       else
         Process.daemon(true, true)
+        daemon_execute
       end
-
+    end
+    
+    def daemon_execute
       File.umask 0000
       FileUtils.touch log_file
       STDIN.reopen    log_file
@@ -279,7 +289,7 @@ module Vegas
 
       # If all else fails, we'll use Thin
       else
-        Rack::Handler::Thin
+        Vegas.jruby? ? Rack::Handler::WEBrick : Rack::Handler::Thin
       end
     end
 

@@ -130,8 +130,12 @@ describe 'Vegas::Runner' do
         vegas(RackApp1, 'rack_app_1', {:skip_launch => true, :sessions => true})
       end
 
-      it "sets default rack handler to thin" do
-        @vegas.rack_handler.should == Rack::Handler::Thin
+      it "sets default rack handler to thin when in ruby and WEBrick when in jruby" do
+        if Vegas.jruby?
+          @vegas.rack_handler.should == Rack::Handler::WEBrick
+        else
+          @vegas.rack_handler.should == Rack::Handler::Thin
+        end
       end
     end
 

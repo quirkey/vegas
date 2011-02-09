@@ -1,5 +1,6 @@
 begin
   require 'rack'
+  require 'rbconfig'
 rescue LoadError
   require 'rubygems'
   require 'rack'
@@ -12,4 +13,8 @@ module Vegas
   WINDOWS = !!(RUBY_PLATFORM =~ /(mingw|bccwin|wince|mswin32)/i)
 
   autoload :Runner, 'vegas/runner'
+  
+  def self.jruby?
+    RbConfig::CONFIG["RUBY_INSTALL_NAME"] =~ /^jruby/ ? true : false
+  end
 end
