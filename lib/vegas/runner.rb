@@ -99,6 +99,7 @@ module Vegas
 
     def start(path = nil)
       logger.info "Running with Windows Settings" if WINDOWS
+      logger.info "Running with JRuby" if JRUBY
       logger.info "Starting #{quoted_app_name}..."
       begin
         check_for_running(path)
@@ -179,7 +180,7 @@ module Vegas
 
     # Adapted from Rackup
     def daemonize!
-      if Vegas.jruby?
+      if JRUBY
         # It's not a true daemon but when executed with & works like one
         thread = Thread.new {daemon_execute}
         thread.join
@@ -217,7 +218,7 @@ module Vegas
 
     def kill!
       pid = File.read(pid_file)
-      logger.warn "Sending INT to #{pid.to_i}"
+      logger.warn "Sending #{kill_command} to #{pid.to_i}"
       Process.kill(kill_command, pid.to_i)
     rescue => e
       logger.warn "pid not found at #{pid_file} : #{e}"
@@ -289,7 +290,7 @@ module Vegas
 
       # If all else fails, we'll use Thin
       else
-        Vegas.jruby? ? Rack::Handler::WEBrick : Rack::Handler::Thin
+        JRUBY ? Rack::Handler::WEBrick : Rack::Handler::Thin
       end
     end
 
@@ -386,7 +387,9 @@ module Vegas
     end
 
     def kill_command
-      WINDOWS ? 1 : :INT
+      return :TERM if JRUBY
+      return 1 if WINDOWS
+      :INT
     end
 
     def delete_pid!

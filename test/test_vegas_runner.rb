@@ -131,7 +131,7 @@ describe 'Vegas::Runner' do
       end
 
       it "sets default rack handler to thin when in ruby and WEBrick when in jruby" do
-        if Vegas.jruby?
+        if Vegas::JRUBY
           @vegas.rack_handler.should == Rack::Handler::WEBrick
         else
           @vegas.rack_handler.should == Rack::Handler::Thin
