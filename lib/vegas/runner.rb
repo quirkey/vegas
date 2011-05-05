@@ -168,11 +168,13 @@ module Vegas
       logger.info "Running with Rack handler: #{@rack_handler.inspect}"
 
       rack_handler.run app, :Host => host, :Port => port do |server|
-        trap(kill_command) do
-          ## Use thins' hard #stop! if available, otherwise just #stop
-          server.respond_to?(:stop!) ? server.stop! : server.stop
-          logger.info "#{quoted_app_name} received INT ... stopping"
-          delete_pid!
+        kill_commands.each do |command|
+          trap(command) do
+            ## Use thins' hard #stop! if available, otherwise just #stop
+            server.respond_to?(:stop!) ? server.stop! : server.stop
+            logger.info "#{quoted_app_name} received INT ... stopping"
+            delete_pid!
+          end
         end
       end
     end
@@ -375,8 +377,8 @@ module Vegas
       exit
     end
 
-    def kill_command
-      WINDOWS ? 1 : :INT
+    def kill_commands
+      WINDOWS ? [1] : [:INT, :TERM]
     end
 
     def delete_pid!
