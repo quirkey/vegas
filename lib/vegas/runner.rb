@@ -392,6 +392,10 @@ module Vegas
       WINDOWS ? [1] : [:INT, :TERM]
     end
 
+    def kill_command
+      kill_commands[0]
+    end
+
     def delete_pid!
       File.delete(pid_file) if File.exist?(pid_file)
     end
