@@ -145,10 +145,7 @@ module Vegas
         check_url ||= url
         options[:no_proxy] ? open(check_url, :proxy => nil) : open(check_url)
         false
-      rescue Errno::ECONNREFUSED => e
-        true
-      rescue Errno::EPERM => e
-        # catches the "Operation not permitted" under Cygwin
+      rescue Errno::ECONNREFUSED, Errno::EPERM, Errno::ETIMEDOUT
         true
       end
     end
@@ -189,19 +186,19 @@ module Vegas
         # It's not a true daemon but when executed with & works like one
         thread = Thread.new {daemon_execute}
         thread.join
-        
+
       elsif RUBY_VERSION < "1.9"
         logger.debug "Parent Process: #{Process.pid}"
         exit!(0) if fork
         logger.debug "Child Process: #{Process.pid}"
         daemon_execute
-        
+
       else
         Process.daemon(true, true)
         daemon_execute
       end
     end
-    
+
     def daemon_execute
       File.umask 0000
       FileUtils.touch log_file
