@@ -7,7 +7,7 @@ rescue LoadError
 end
 
 module Vegas
-  VERSION = "0.1.9"
+  VERSION = "0.1.10"
   WINDOWS = !!(RUBY_PLATFORM =~ /(mingw|bccwin|wince|mswin32)/i)
   JRUBY = !!(RbConfig::CONFIG["RUBY_INSTALL_NAME"] =~ /^jruby/i)
 
