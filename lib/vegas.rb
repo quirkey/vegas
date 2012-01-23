@@ -6,8 +6,6 @@ rescue LoadError
   require 'rack'
 end
 
-$LOAD_PATH.unshift File.dirname(__FILE__)
-
 module Vegas
   VERSION = "0.1.9"
   WINDOWS = !!(RUBY_PLATFORM =~ /(mingw|bccwin|wince|mswin32)/i)
