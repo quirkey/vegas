@@ -79,7 +79,7 @@ module Vegas
 
     def app_dir
       if !options[:app_dir] && !ROOT_DIR
-        raise ArgumentError.new("nor --app-dir neither EVN['HOME'] defined")
+        raise ArgumentError.new("nor --app-dir neither ENV['HOME'] defined")
       end
       options[:app_dir] || File.join(ROOT_DIR, filesystem_friendly_app_name)
     end
