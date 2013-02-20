@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
     "test/test_vegas_runner.rb",
     "vegas.gemspec"
   ]
-  s.homepage = "http://code.quirkey.com/vegas"
+  s.homepage = "https://github.com/quirkey/vegas"
   s.require_paths = ["lib"]
   s.rubyforge_project = "quirkey"
   s.rubygems_version = "1.8.10"
