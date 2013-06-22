@@ -1,7 +1,7 @@
 dependencies = %w{
   bacon
-  mocha/standalone
-  mocha/object
+  mocha/api
+  mocha/setup
   sinatra
 }
 
