@@ -23,6 +23,7 @@ Jeweler::Tasks.new do |s|
   s.email = ["aaron@quirkey.com"]
   s.homepage = %q{http://code.quirkey.com/vegas}
   s.rubyforge_project = %q{quirkey}
+  s.license = %{MIT}
   
   s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
   

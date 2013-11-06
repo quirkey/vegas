@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
     "vegas.gemspec"
   ]
   s.homepage = "http://code.quirkey.com/vegas"
+  s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubyforge_project = "quirkey"
   s.rubygems_version = "1.8.10"
