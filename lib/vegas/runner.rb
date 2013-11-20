@@ -145,7 +145,7 @@ module Vegas
         check_url ||= url
         options[:no_proxy] ? open(check_url, :proxy => nil) : open(check_url)
         false
-      rescue Errno::ECONNREFUSED, Errno::EPERM, Errno::ETIMEDOUT
+      rescue Errno::ECONNREFUSED, Errno::EPERM, Errno::ETIMEDOUT, OpenURI::HTTPError
         true
       end
     end
