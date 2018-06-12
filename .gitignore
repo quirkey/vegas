@@ -3,3 +3,5 @@ test/tmp
 pkg/*
 _layouts
 *.sw?
+/Gemfile.lock
+/.bundle
