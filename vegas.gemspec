@@ -33,7 +33,6 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://code.quirkey.com/vegas"
   s.require_paths = ["lib"]
-  s.rubyforge_project = "quirkey"
   s.rubygems_version = "1.8.10"
   s.summary = "Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps."
 
