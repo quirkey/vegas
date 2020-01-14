@@ -22,7 +22,6 @@ Jeweler::Tasks.new do |s|
   s.description          = %{Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps. It includes a class Vegas::Runner that wraps Rack/Sinatra applications and provides a simple command line interface and launching mechanism.}
   s.email = ["aaron@quirkey.com"]
   s.homepage = %q{http://code.quirkey.com/vegas}
-  s.rubyforge_project = %q{quirkey}
   
   s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
   
