@@ -36,6 +36,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "quirkey"
   s.rubygems_version = "1.8.10"
   s.summary = "Vegas aims to solve the simple problem of creating executable versions of Sinatra/Rack apps."
+  s.license = "MIT"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
