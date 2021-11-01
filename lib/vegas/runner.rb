@@ -143,7 +143,7 @@ module Vegas
     def port_open?(check_url = nil)
       begin
         check_url ||= url
-        options[:no_proxy] ? open(check_url, :proxy => nil) : open(check_url)
+        options[:no_proxy] ? URI.open(check_url, :proxy => nil) : URI.open(check_url)
         false
       rescue Errno::ECONNREFUSED, Errno::EPERM, Errno::ETIMEDOUT
         true
