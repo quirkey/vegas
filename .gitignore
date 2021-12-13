@@ -1,5 +1,6 @@
 .DS_Store
 test/tmp
+Gemfile.lock
 pkg/*
 _layouts
 *.sw?
