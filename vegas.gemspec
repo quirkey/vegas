@@ -34,5 +34,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
   s.add_development_dependency(%q<mocha>, ["~> 0.9.8"])
   s.add_development_dependency(%q<bacon>, ["~> 1.1.0"])
-  s.add_development_dependency(%q<sinatra>, ["~> 0.9.4"])
+  s.add_development_dependency(%q<rake>)
+  s.add_development_dependency(%q<sinatra>)
+  s.add_development_dependency(%q<thin>)
 end
